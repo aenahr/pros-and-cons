@@ -1,26 +1,21 @@
 import React from 'react';
-import logo from './assets/logo.svg';
+import logo from './assets/pros-cons-logo-dark.svg';
 import './App.css';
-import Menu from './components/Menu';
+import Sidebar from './components/sidebar/Sidebar';
+import Chart from './components/chart/Chart';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <Menu />
-      </header>
+      <Sidebar pageWrapId={"container"} outerContainerId={"App"} />
+      <div id="container" className="appContainer">
+        <div id="title">
+          <img id="logo" src={logo} alt="logo"/>
+          <p><i>An interactive amd immersive way of creating pros and con charts</i></p>
+        </div>
+
+        <Chart />
+      </div>
     </div>
   );
 }
