@@ -68,6 +68,11 @@
     text-decoration: none;
     padding: 0.25em 0;
   }
+
+  .bm-item:hover {
+    text-decoration: none;
+    color: var(--color-tertiary);
+  }
   
   /* Styling of overlay */
   .bm-overlay {

@@ -1,0 +1,53 @@
+.input{
+    background: transparent;
+    max-width: 15em;
+}
+
+.input-group{
+    justify-content: center;
+}
+
+.input:focus{
+    background: transparent;
+}
+
+.inputLabel{
+    font-style: bold;
+}
+
+Form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.button{
+    margin-top: 1em;
+}
+
+.tertiary{
+    background-color: var(--color-tertiary) !important;
+    border-color: var(--color-tertiary) !important;
+    color: var(--color-secondary) !important;
+}
+
+.tertiary:hover{
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-secondary) !important;
+}
+
+.checkbox{
+    margin-left: 0.25em;
+    align-self: center;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.italic{
+    font-style: italic;
+}
