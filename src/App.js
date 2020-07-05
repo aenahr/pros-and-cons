@@ -11,7 +11,7 @@ function App() {
       <div id="container" className="appContainer">
         <div id="title">
           <img id="logo" src={logo} alt="logo"/>
-          <p><i>An interactive amd immersive way of creating pros and con charts</i></p>
+          <p><i>An interactive and simple way of creating pros and con charts</i></p>
         </div>
 
         <Chart />

@@ -1,6 +1,58 @@
 import React from 'react';
 import "./Chart.css";
-import { FormControl, Button, Form, InputGroup } from 'react-bootstrap';
+import { FormControl, Button, Form, InputGroup, Container, Row, Col } from 'react-bootstrap';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { FaBeer } from 'react-icons/fa';
+
+
+const grid = 8;
+
+const prosListStyle = isDraggingOver => ({
+    background: isDraggingOver ? '#5C95FF' : '#78BC61',
+    padding: grid,
+    width: 250
+});
+
+const consListStyle = isDraggingOver => ({
+    background: isDraggingOver ? '#5C95FF' : '#FF6666',
+    padding: grid,
+    width: 250
+});
+
+const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+};
+
+const move = (source, destination, droppableSource, droppableDestination) => {
+    const sourceClone = Array.from(source);
+    const destClone = Array.from(destination);
+    const [removed] = sourceClone.splice(droppableSource.index, 1);
+
+    destClone.splice(droppableDestination.index, 0, removed);
+
+    const result = {};
+    result[droppableSource.droppableId] = sourceClone;
+    result[droppableDestination.droppableId] = destClone;
+
+    return result;
+};
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+    // some basic styles to make the items look a bit nicer
+    userSelect: 'none',
+    padding: grid * 2,
+    margin: `0 0 ${grid}px 0`,
+
+    // change background colour if dragging
+    background: isDragging ? 'lightgreen' : '#EFE9E7',
+
+    // styles we need to apply on draggables
+    ...draggableStyle
+});
 
 export default class Chart extends React.Component {
 
@@ -10,11 +62,55 @@ export default class Chart extends React.Component {
             title: "",
             bold: false,
             italic: false,
+            pros: [
+                {
+                    id: "1",
+                    content: 'this is it'
+                },
+                {
+                    id: "2",
+                    content: 'here we go'
+                },
+                {
+                    id: "3",
+                    content: 'hello world'
+                },
+                {
+                    id: "4",
+                    content: 'goodbye world'
+                },
+                {
+                    id: "5",
+                    content: 'hai world'
+                },
+            ],
+            cons: [
+                {
+                    id: "100",
+                    content: 'beckles'
+                },
+                {
+                    id: "7",
+                    content: 'beckle is love'
+                },
+                {
+                    id: "8",
+                    content: 'beckle is life'
+                },
+                {
+                    id: "19",
+                    content: 'beckle is bae'
+                },
+                {
+                    id: "10",
+                    content: 'beckl beckles'
+                },
+            ],
+            idList: {
+                droppable: "pros",
+                droppable2: "cons"
+            }
         }
-
-        this.toggleBold = this.toggleBold.bind(this);
-        this.toggleItalic = this.toggleItalic.bind(this);
-
     }
 
     
@@ -22,6 +118,73 @@ export default class Chart extends React.Component {
         return(
             <div id="chart">
                 <h1 id="chartTitle" className={(this.state.bold ? 'bold' : '') + " " + (this.state.italic ? 'italic' : '')}>{this.state.title}</h1>
+                <div className="pros-cons-chart"><DragDropContext onDragEnd={this.onDragEnd}>
+                    <Droppable droppableId="droppable">
+                        {(provided, snapshot) => (
+                            <div
+                                ref={provided.innerRef}
+                                style={prosListStyle(snapshot.isDraggingOver)}>
+                                {this.state.pros.map((item, index) => (
+                                    <Draggable
+                                        key={item.id}
+                                        draggableId={item.id}
+                                        index={index}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={getItemStyle(
+                                                    snapshot.isDragging,
+                                                    provided.draggableProps.style
+                                                )}>
+                                                {item.content}
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                    <Droppable droppableId="droppable2">
+                        {(provided, snapshot) => (
+                            <div
+                                ref={provided.innerRef}
+                                style={consListStyle(snapshot.isDraggingOver)}>
+                                {this.state.cons.map((item, index) => (
+                                    <Draggable
+                                        key={item.id}
+                                        draggableId={item.id}
+                                        index={index}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={getItemStyle(
+                                                    snapshot.isDragging,
+                                                    provided.draggableProps.style
+                                                )}>
+                                                    <Container>
+                                                        <Row>
+                                                            <Col sm="10">
+                                                                {item.content}
+                                                            </Col>
+                                                            <Col sm="2">
+                                                                <Button size="sm" onClick = {() => this.removeItem(item,index)}><FaBeer  /></Button>
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext></div>
                 <Form>
                     <InputGroup>
                         <InputGroup.Append className="inputLabel">
@@ -32,19 +195,32 @@ export default class Chart extends React.Component {
                         <Form.Check className="checkbox" checked={this.state.bold} onChange={this.toggleBold} label={"bold"} />
                         <Form.Check className="checkbox" checked={this.state.italic} onChange={this.toggleItalic} label={"italicize"} />
                     </InputGroup>
-                    <Button className="button tertiary">Create Table</Button>
+                    <Button onClick={this.createItem} className="button tertiary">Create Table!</Button>
                 </Form>
             </div>
         )
     }
 
+    createItem = () => {
+        let newItem = {id: "20", content: "hehe"};
+        let newList = this.state.pros.push(newItem);
+        this.setState({ pros: newList})
+    }
+
+    removeItem = (item,index) => {
+        console.log("I'm here")
+        console.log(item);
+        console.log(index);
+        // this.state.items.splice(index, 1)
+    }
+
     /** Function that will bold or un-bold the title */
-    toggleBold(){
+    toggleBold = () => {
         this.setState({ bold: !this.state.bold});
     }
 
     /** Function that will italicize or un-italicize the title */
-    toggleItalic(){
+    toggleItalic = () => {
         this.setState({ italic: !this.state.italic});
     }
 
@@ -52,4 +228,47 @@ export default class Chart extends React.Component {
     handleTitleChange = (e) => {
         this.setState({title: e.target.value});
     }
+
+    /** Function that finds the targeted list name  */
+    getList = id => this.state[this.state.idList[id]];
+
+    /** Function that moves chart items and reorders or moves them to another chart */
+    onDragEnd = result => {
+        
+        const { source, destination } = result;
+        // dropped outside the list
+        if (!destination) {
+            return;
+        }
+
+        if (source.droppableId === destination.droppableId) {
+            const items = reorder(
+                this.getList(source.droppableId),
+                source.index,
+                destination.index
+            );
+
+            let state = { items };
+
+            if (source.droppableId === 'droppable2') {
+                state = { cons: items };
+            } else{
+                state = { pros: items};
+            }
+
+            this.setState(state);
+        } else {
+            const result = move(
+                this.getList(source.droppableId),
+                this.getList(destination.droppableId),
+                source,
+                destination
+            );
+
+            this.setState({
+                pros: result.droppable,
+                cons: result.droppable2
+            });
+        }
+    };
 }
