@@ -2,28 +2,26 @@ import React from 'react';
 import "./Chart.css";
 import { FormControl, Button, Form, InputGroup, Container, Row, Col } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FaBeer } from 'react-icons/fa';
-
+import { MdClose, MdEdit } from 'react-icons/md';
 
 const grid = 8;
 
 const prosListStyle = isDraggingOver => ({
     background: isDraggingOver ? '#5C95FF' : '#78BC61',
     padding: grid,
-    width: 250
+    width: 400
 });
 
 const consListStyle = isDraggingOver => ({
     background: isDraggingOver ? '#5C95FF' : '#FF6666',
     padding: grid,
-    width: 250
+    width: 400
 });
 
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-
     return result;
 };
 
@@ -44,7 +42,7 @@ const move = (source, destination, droppableSource, droppableDestination) => {
 const getItemStyle = (isDragging, draggableStyle) => ({
     // some basic styles to make the items look a bit nicer
     userSelect: 'none',
-    padding: grid * 2,
+    padding: '0.25em',
     margin: `0 0 ${grid}px 0`,
 
     // change background colour if dragging
@@ -99,7 +97,7 @@ export default class Chart extends React.Component {
                 },
                 {
                     id: "19",
-                    content: 'beckle is bae'
+                    content: 'beckle is bae beckle is bae beckle is bae beckle is bae beckle is bae beckle is bae beckle is baebeckle is bae beckle is baebeckle is baebeckle is bae'
                 },
                 {
                     id: "10",
@@ -138,7 +136,17 @@ export default class Chart extends React.Component {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                {item.content}
+                                                <Container className="item-container">
+                                                    <Row>
+                                                        <Col sm="10" className="item-col">
+                                                            <p className="item-content">{item.content}</p>
+                                                        </Col>
+                                                        <Col sm="2" className="item-col">
+                                                            <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
+                                                            <MdClose className="icon-button" onClick = {() => this.removePro(index)} />
+                                                        </Col>
+                                                    </Row>
+                                                </Container>
                                             </div>
                                         )}
                                     </Draggable>
@@ -166,16 +174,17 @@ export default class Chart extends React.Component {
                                                     snapshot.isDragging,
                                                     provided.draggableProps.style
                                                 )}>
-                                                    <Container>
-                                                        <Row>
-                                                            <Col sm="10">
-                                                                {item.content}
-                                                            </Col>
-                                                            <Col sm="2">
-                                                                <Button size="sm" onClick = {() => this.removeItem(item,index)}><FaBeer  /></Button>
-                                                            </Col>
-                                                        </Row>
-                                                    </Container>
+                                                <Container className="item-container">
+                                                    <Row>
+                                                        <Col sm="10" className="item-col">
+                                                            <p className="item-content">{item.content}</p>
+                                                        </Col>
+                                                        <Col sm="2" className="item-col">
+                                                            <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
+                                                            <MdClose className="icon-button" onClick = {() => this.removeCon(index)} />
+                                                        </Col>
+                                                    </Row>
+                                                </Container>
                                             </div>
                                         )}
                                     </Draggable>
@@ -201,17 +210,25 @@ export default class Chart extends React.Component {
         )
     }
 
+    /** Function that create a new item to list */
     createItem = () => {
         let newItem = {id: "20", content: "hehe"};
         let newList = this.state.pros.push(newItem);
         this.setState({ pros: newList})
     }
 
-    removeItem = (item,index) => {
-        console.log("I'm here")
-        console.log(item);
-        console.log(index);
-        // this.state.items.splice(index, 1)
+    /** Function that remove an item from cons list */
+    removeCon = (index) => {
+        let arr = [...this.state.cons];
+        arr.splice(index,1);
+        this.setState({cons : arr});
+    }
+
+    /** Function that remove an item from pros list */
+    removePro = (index) => {
+        let arr = [...this.state.pros];
+        arr.splice(index,1);
+        this.setState({pros : arr});
     }
 
     /** Function that will bold or un-bold the title */

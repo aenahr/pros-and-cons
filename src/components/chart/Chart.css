@@ -58,3 +58,22 @@ Form{
     justify-content: center;
     margin: 2.5em 0;
 }
+
+.iconButton:hover{
+    color: var(--color-tertiary);
+    cursor: pointer;
+}
+
+.item-content{
+    padding: 0;
+    margin: 0;
+}
+
+.item-container{
+    padding: 0;
+    margin: 0;
+}
+
+.item-col{
+    align-self: center;
+}
