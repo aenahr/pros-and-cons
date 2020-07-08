@@ -52,6 +52,11 @@ const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
 });
 
+const getNextId = (array) => {
+    let arr = array.map(a => a.id);
+    return String(Math.max.apply(null, arr.map(Number))+1);
+};
+
 export default class Chart extends React.Component {
 
     constructor(){
@@ -79,7 +84,7 @@ export default class Chart extends React.Component {
                 },
                 {
                     id: "5",
-                    content: 'hai world'
+                    content: 'it really b like dat sometimes'
                 },
             ],
             cons: [
@@ -108,7 +113,12 @@ export default class Chart extends React.Component {
                 droppable: "pros",
                 droppable2: "cons"
             }
-        }
+        };
+    }
+
+    componentDidMount() {
+        // get next unique id
+        this.state.nextId = getNextId(this.state.pros.concat(this.state.cons));
     }
 
     
@@ -212,9 +222,11 @@ export default class Chart extends React.Component {
 
     /** Function that create a new item to list */
     createItem = () => {
-        let newItem = {id: "20", content: "hehe"};
-        let newList = this.state.pros.push(newItem);
-        this.setState({ pros: newList})
+        this.setState({ pros: [...this.state.pros, {id: this.state.nextId, content: "hehe"}] });
+        // increment string counter
+        let incNum = (+this.state.nextId+1)+"";
+        // change to new increment
+        this.setState({ nextId : incNum});
     }
 
     /** Function that remove an item from cons list */
