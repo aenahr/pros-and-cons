@@ -2,18 +2,19 @@ import React from 'react';
 import "./Chart.css";
 import { FormControl, Button, Form, InputGroup, Container, Row, Col } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdClose, MdEdit } from 'react-icons/md';
+import { MdClose, MdEdit, MdAdd } from 'react-icons/md';
+import Switch from "react-switch";
 
 const grid = 8;
 
 const prosListStyle = isDraggingOver => ({
-    background: isDraggingOver ? '#5C95FF' : '#78BC61',
+    background: '#78BC61',
     padding: grid,
     width: 400
 });
 
 const consListStyle = isDraggingOver => ({
-    background: isDraggingOver ? '#5C95FF' : '#FF6666',
+    background: '#FF6666',
     padding: grid,
     width: 400
 });
@@ -46,7 +47,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
     margin: `0 0 ${grid}px 0`,
 
     // change background colour if dragging
-    background: isDragging ? 'lightgreen' : '#EFE9E7',
+    background: isDragging ? '#F8EEA0' : '#EFE9E7',
 
     // styles we need to apply on draggables
     ...draggableStyle
@@ -65,28 +66,9 @@ export default class Chart extends React.Component {
             title: "",
             bold: false,
             italic: false,
-            pros: [
-                {
-                    id: "1",
-                    content: 'this is it'
-                },
-                {
-                    id: "2",
-                    content: 'here we go'
-                },
-                {
-                    id: "3",
-                    content: 'hello world'
-                },
-                {
-                    id: "4",
-                    content: 'goodbye world'
-                },
-                {
-                    id: "5",
-                    content: 'it really b like dat sometimes'
-                },
-            ],
+            checked: true,
+            inputValue: "",
+            pros: [{ id: "1", content: 'this is it' }, { id: "2", content: 'here we go' }, { id: "3", content: 'hello world' }, { id: "4", content: 'goodbye world' }, { id: "5", content: 'it really b like dat sometimes' }],
             cons: [
                 {
                     id: "100",
@@ -121,89 +103,9 @@ export default class Chart extends React.Component {
         this.state.nextId = getNextId(this.state.pros.concat(this.state.cons));
     }
 
-    
     render() {
         return(
             <div id="chart">
-                <h1 id="chartTitle" className={(this.state.bold ? 'bold' : '') + " " + (this.state.italic ? 'italic' : '')}>{this.state.title}</h1>
-                <div className="pros-cons-chart"><DragDropContext onDragEnd={this.onDragEnd}>
-                    <Droppable droppableId="droppable">
-                        {(provided, snapshot) => (
-                            <div
-                                ref={provided.innerRef}
-                                style={prosListStyle(snapshot.isDraggingOver)}>
-                                {this.state.pros.map((item, index) => (
-                                    <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
-                                        index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                <Container className="item-container">
-                                                    <Row>
-                                                        <Col sm="10" className="item-col">
-                                                            <p className="item-content">{item.content}</p>
-                                                        </Col>
-                                                        <Col sm="2" className="item-col">
-                                                            <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
-                                                            <MdClose className="icon-button" onClick = {() => this.removePro(index)} />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                    <Droppable droppableId="droppable2">
-                        {(provided, snapshot) => (
-                            <div
-                                ref={provided.innerRef}
-                                style={consListStyle(snapshot.isDraggingOver)}>
-                                {this.state.cons.map((item, index) => (
-                                    <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
-                                        index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}>
-                                                <Container className="item-container">
-                                                    <Row>
-                                                        <Col sm="10" className="item-col">
-                                                            <p className="item-content">{item.content}</p>
-                                                        </Col>
-                                                        <Col sm="2" className="item-col">
-                                                            <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
-                                                            <MdClose className="icon-button" onClick = {() => this.removeCon(index)} />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext></div>
                 <Form>
                     <InputGroup>
                         <InputGroup.Append className="inputLabel">
@@ -214,19 +116,114 @@ export default class Chart extends React.Component {
                         <Form.Check className="checkbox" checked={this.state.bold} onChange={this.toggleBold} label={"bold"} />
                         <Form.Check className="checkbox" checked={this.state.italic} onChange={this.toggleItalic} label={"italicize"} />
                     </InputGroup>
+                    <h1 id="chartTitle" className={(this.state.bold ? 'bold' : '') + " " + (this.state.italic ? 'italic' : '')}>{this.state.title}</h1>
+                    <div className="pros-cons-chart"><DragDropContext onDragEnd={this.onDragEnd}>
+                        <Droppable droppableId="droppable">
+                            {(provided, snapshot) => (
+                                <div ref={provided.innerRef} style={prosListStyle(snapshot.isDraggingOver)}>
+                                    {this.state.pros.map((item, index) => (
+                                        <Draggable key={item.id} draggableId={item.id} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}>
+                                                    <Container className="item-container">
+                                                        <Row>
+                                                            <Col sm="10" className="item-col">
+                                                                <p className="item-content">{item.content}</p>
+                                                            </Col>
+                                                            <Col sm="2" className="item-col">
+                                                                <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
+                                                                <MdClose className="icon-button" onClick = {() => this.removePro(index)} />
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                        <Droppable droppableId="droppable2">
+                            {(provided, snapshot) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    style={consListStyle(snapshot.isDraggingOver)}>
+                                    {this.state.cons.map((item, index) => (
+                                        <Draggable
+                                            key={item.id}
+                                            draggableId={item.id}
+                                            index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    style={getItemStyle(
+                                                        snapshot.isDragging,
+                                                        provided.draggableProps.style
+                                                    )}>
+                                                    <Container className="item-container">
+                                                        <Row>
+                                                            <Col sm="10" className="item-col">
+                                                                <p className="item-content">{item.content}</p>
+                                                            </Col>
+                                                            <Col sm="2" className="item-col">
+                                                                <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
+                                                                <MdClose className="icon-button" onClick = {() => this.removeCon(index)} />
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext></div>
+                    <div className="input-container">
+                        <MdAdd className="icon-button-add" onClick={this.createItem} />
+                        <FormControl required type="text" placeholder="enter pro or con..." className="input-value" value={this.state.inputValue} onChange={this.handleText} onKeyPress={this.handleEnterInput} />
+                        <Switch onColor="#78BC61" offColor="#FF6666" onChange={this.handleSwitch} checked={this.state.checked} />
+                    </div>
                     <Button onClick={this.createItem} className="button tertiary">Create Table!</Button>
                 </Form>
             </div>
         )
     }
 
+    /** */
+    handleEnterInput = (event) => {
+        if(event.key == "Enter"){
+            this.createItem();
+        }
+    }
+
+    /** Changes the value if the user's input in pro or con */
+    handleText = (event) => {
+        this.setState({ inputValue : event.target.value });
+    }
+
+    /** Upon user dragging or clicking switch, change to adding as a pro or con */
+    handleSwitch = (checked) => {
+        this.setState({ checked });
+        console.log("Hello");
+    }
+
     /** Function that create a new item to list */
     createItem = () => {
-        this.setState({ pros: [...this.state.pros, {id: this.state.nextId, content: "hehe"}] });
+        if(this.state.checked == true){
+            this.setState({ pros: [ ...this.state.pros, {id: this.state.nextId, content: this.state.inputValue}]});
+        }
+        else{
+            this.setState({ cons: [ ...this.state.cons, {id: this.state.nextId, content: this.state.inputValue}]});
+        }
         // increment string counter
         let incNum = (+this.state.nextId+1)+"";
         // change to new increment
-        this.setState({ nextId : incNum});
+        this.setState({ nextId : incNum, inputValue: ""});
     }
 
     /** Function that remove an item from cons list */
