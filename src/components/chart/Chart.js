@@ -4,7 +4,7 @@ import { FormControl, Button, Form, InputGroup, Container, Row, Col } from 'reac
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MdClose, MdEdit, MdAdd } from 'react-icons/md';
 import Switch from "react-switch";
-
+import ChartItem from "../../models/ChartItem";
 const grid = 8;
 
 const prosListStyle = isDraggingOver => ({
@@ -60,6 +60,8 @@ const getNextId = (array) => {
 
 export default class Chart extends React.Component {
 
+    isProEmpty;
+
     constructor(){
         super();
         this.state = {
@@ -68,29 +70,8 @@ export default class Chart extends React.Component {
             italic: false,
             checked: true,
             inputValue: "",
-            pros: [{ id: "1", content: 'this is it' }, { id: "2", content: 'here we go' }, { id: "3", content: 'hello world' }, { id: "4", content: 'goodbye world' }, { id: "5", content: 'it really b like dat sometimes' }],
-            cons: [
-                {
-                    id: "100",
-                    content: 'beckles'
-                },
-                {
-                    id: "7",
-                    content: 'beckle is love'
-                },
-                {
-                    id: "8",
-                    content: 'beckle is life'
-                },
-                {
-                    id: "19",
-                    content: 'beckle is bae beckle is bae beckle is bae beckle is bae beckle is bae beckle is bae beckle is baebeckle is bae beckle is baebeckle is baebeckle is bae'
-                },
-                {
-                    id: "10",
-                    content: 'beckl beckles'
-                },
-            ],
+            pros: [],
+            cons: [new ChartItem({id: '6', content: 'herp derp'}), new ChartItem({id: '10', content: 'derp derp'}), new ChartItem({id: '11', content: 'derp herp'})],
             idList: {
                 droppable: "pros",
                 droppable2: "cons"
@@ -120,7 +101,7 @@ export default class Chart extends React.Component {
                     <div className="pros-cons-chart"><DragDropContext onDragEnd={this.onDragEnd}>
                         <Droppable droppableId="droppable">
                             {(provided, snapshot) => (
-                                <div ref={provided.innerRef} style={prosListStyle(snapshot.isDraggingOver)}>
+                                <div ref={provided.innerRef} className={this.state.pros.length < 1 ? 'empty-container' : ''} style={prosListStyle(snapshot.isDraggingOver)}>
                                     {this.state.pros.map((item, index) => (
                                         <Draggable key={item.id} draggableId={item.id} index={index}>
                                             {(provided, snapshot) => (
@@ -141,6 +122,7 @@ export default class Chart extends React.Component {
                                         </Draggable>
                                     ))}
                                     {provided.placeholder}
+                                    {this.state.pros.length < 1 && <p className={this.state.pros.length < 1 ? 'center-msg' : ''}><i>no items</i></p>}
                                 </div>
                             )}
                         </Droppable>
@@ -150,12 +132,9 @@ export default class Chart extends React.Component {
                                     ref={provided.innerRef}
                                     style={consListStyle(snapshot.isDraggingOver)}>
                                     {this.state.cons.map((item, index) => (
-                                        <Draggable
-                                            key={item.id}
-                                            draggableId={item.id}
-                                            index={index}>
+                                        <Draggable key={item.id} draggableId={item.id} index={index}>
                                             {(provided, snapshot) => (
-                                                <div
+                                                <div className={this.state.cons.length < 1 ? 'empty-container' : ''}
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
@@ -179,6 +158,7 @@ export default class Chart extends React.Component {
                                         </Draggable>
                                     ))}
                                     {provided.placeholder}
+                                    {this.state.cons.length < 1 && <p className={this.state.cons.length < 1 ? 'center-msg' : ''}><i>no items</i></p>}
                                 </div>
                             )}
                         </Droppable>
@@ -188,37 +168,30 @@ export default class Chart extends React.Component {
                         <FormControl required type="text" placeholder="enter pro or con..." className="input-value" value={this.state.inputValue} onChange={this.handleText} onKeyPress={this.handleEnterInput} />
                         <Switch onColor="#78BC61" offColor="#FF6666" onChange={this.handleSwitch} checked={this.state.checked} />
                     </div>
-                    <Button onClick={this.createItem} className="button tertiary">Create Table!</Button>
+                    <Button className="button tertiary">Create Table!</Button>
                 </Form>
             </div>
         )
     }
 
-    /** */
+    /** Function that listens if user presses enter - another optional way of creating an item */
     handleEnterInput = (event) => {
-        if(event.key == "Enter"){
-            this.createItem();
-        }
+        if(event.key === "Enter") this.createItem();
     }
 
     /** Changes the value if the user's input in pro or con */
-    handleText = (event) => {
-        this.setState({ inputValue : event.target.value });
-    }
+    handleText = (event) => { this.setState({ inputValue : event.target.value }); }
 
     /** Upon user dragging or clicking switch, change to adding as a pro or con */
-    handleSwitch = (checked) => {
-        this.setState({ checked });
-        console.log("Hello");
-    }
+    handleSwitch = (checked) => { this.setState({ checked }); }
 
     /** Function that create a new item to list */
     createItem = () => {
-        if(this.state.checked == true){
-            this.setState({ pros: [ ...this.state.pros, {id: this.state.nextId, content: this.state.inputValue}]});
+        if(this.state.checked === true){
+            this.setState({ pros: [ ...this.state.pros, new ChartItem({id: this.state.nextId, content: this.state.inputValue}) ]});
         }
         else{
-            this.setState({ cons: [ ...this.state.cons, {id: this.state.nextId, content: this.state.inputValue}]});
+            this.setState({ cons: [ ...this.state.cons, new ChartItem({id: this.state.nextId, content: this.state.inputValue}) ]});
         }
         // increment string counter
         let incNum = (+this.state.nextId+1)+"";
@@ -241,19 +214,13 @@ export default class Chart extends React.Component {
     }
 
     /** Function that will bold or un-bold the title */
-    toggleBold = () => {
-        this.setState({ bold: !this.state.bold});
-    }
+    toggleBold = () => { this.setState({ bold: !this.state.bold}); }
 
     /** Function that will italicize or un-italicize the title */
-    toggleItalic = () => {
-        this.setState({ italic: !this.state.italic});
-    }
+    toggleItalic = () => {  this.setState({ italic: !this.state.italic}); }
 
     /** Function that changes the value of of the chart title as the user types */
-    handleTitleChange = (e) => {
-        this.setState({title: e.target.value});
-    }
+    handleTitleChange = (e) => { this.setState({title: e.target.value}); }
 
     /** Function that finds the targeted list name  */
     getList = id => this.state[this.state.idList[id]];
@@ -275,7 +242,6 @@ export default class Chart extends React.Component {
             );
 
             let state = { items };
-
             if (source.droppableId === 'droppable2') {
                 state = { cons: items };
             } else{

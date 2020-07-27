@@ -103,3 +103,13 @@ Form{
     display: flex;
     align-items: center;
 }
+
+.empty-msg{
+    align-self: center;
+}
+
+.empty-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
