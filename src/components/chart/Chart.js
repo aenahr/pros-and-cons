@@ -2,7 +2,7 @@ import React from 'react';
 import "./Chart.css";
 import { FormControl, Button, Form, InputGroup, Container, Row, Col } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { MdClose, MdEdit, MdAdd } from 'react-icons/md';
+import { MdClose, MdEdit, MdAdd, MdSave, MdCancel } from 'react-icons/md';
 import Switch from "react-switch";
 import ChartItem from "../../models/ChartItem";
 const grid = 8;
@@ -101,7 +101,7 @@ export default class Chart extends React.Component {
                     <div className="pros-cons-chart"><DragDropContext onDragEnd={this.onDragEnd}>
                         <Droppable droppableId="droppable">
                             {(provided, snapshot) => (
-                                <div ref={provided.innerRef} className={this.state.pros.length < 1 ? 'empty-container' : ''} style={prosListStyle(snapshot.isDraggingOver)}>
+                                <div ref={provided.innerRef} style={prosListStyle(snapshot.isDraggingOver)}>
                                     {this.state.pros.map((item, index) => (
                                         <Draggable key={item.id} draggableId={item.id} index={index}>
                                             {(provided, snapshot) => (
@@ -109,7 +109,7 @@ export default class Chart extends React.Component {
                                                     <Container className="item-container">
                                                         <Row>
                                                             <Col sm="10" className="item-col">
-                                                                <p className="item-content">{item.content}</p>
+                                                                {item.editing ? <input type="text" value={item.content} /> : <p className="item-content">{item.content}</p>}
                                                             </Col>
                                                             <Col sm="2" className="item-col">
                                                                 <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
@@ -134,7 +134,7 @@ export default class Chart extends React.Component {
                                     {this.state.cons.map((item, index) => (
                                         <Draggable key={item.id} draggableId={item.id} index={index}>
                                             {(provided, snapshot) => (
-                                                <div className={this.state.cons.length < 1 ? 'empty-container' : ''}
+                                                <div
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
@@ -144,12 +144,16 @@ export default class Chart extends React.Component {
                                                     )}>
                                                     <Container className="item-container">
                                                         <Row>
-                                                            <Col sm="10" className="item-col">
-                                                                <p className="item-content">{item.content}</p>
+                                                            <Col sm="9" className="item-col">
+                                                                {item.editing 
+                                                                    ? <FormControl type="text" className="input-value" value={item.content} onChange={this.handleEdit} />
+                                                                    : <p className="item-content">{item.content}</p>}
                                                             </Col>
-                                                            <Col sm="2" className="item-col">
-                                                                <MdEdit className="icon-button" onClick = {() => this.editItem(index)} />
-                                                                <MdClose className="icon-button" onClick = {() => this.removeCon(index)} />
+                                                            <Col sm="3" className="item-col">
+                                                                {item.editing
+                                                                    ? <div><MdSave className="icon-button" onClick = {() => this.editCon(index)} /><MdCancel className="icon-button" onClick = {() => this.cancelCon(index)} /></div>
+                                                                    : <div><MdEdit className="icon-button" onClick = {() => this.editCon(index)} /><MdClose className="icon-button" onClick = {() => this.removeCon(index)} /></div>
+                                                                }
                                                             </Col>
                                                         </Row>
                                                     </Container>
@@ -184,6 +188,21 @@ export default class Chart extends React.Component {
 
     /** Upon user dragging or clicking switch, change to adding as a pro or con */
     handleSwitch = (checked) => { this.setState({ checked }); }
+
+    /** Function that sets the droppable item from a p to an input */
+    editCon = (index) => {
+        // TODO: set everything on edit to false
+        let arr = [...this.state.cons];
+        arr[index].editing = true;
+        this.setState({cons: arr});
+    }
+
+    /** Function that reverts text of item to read-only mode */
+    cancelCon = (index) => {
+        let arr = [...this.state.cons];
+        arr[index].editing = false;
+        this.setState({cons: arr});
+    }
 
     /** Function that create a new item to list */
     createItem = () => {
